@@ -1,3 +1,10 @@
+
+# Not committing inputs and outputs to github
+/data
+/images
+/logs
+/models
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
