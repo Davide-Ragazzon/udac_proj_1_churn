@@ -2,6 +2,7 @@
 
 
 # import libraries
+import pandas as pd
 
 
 def import_data(pth):
@@ -13,7 +14,10 @@ def import_data(pth):
     output:
             df: pandas dataframe
     '''
-    pass
+    df = pd.read_csv(pth)
+    df['Churn'] = df['Attrition_Flag'].apply(
+        lambda val: 0 if val == "Existing Customer" else 1)
+    return df
 
 
 def perform_eda(df):
@@ -31,7 +35,7 @@ def perform_eda(df):
 def encoder_helper(df, category_lst, response):
     '''
     helper function to turn each categorical column into a new column with
-    propotion of churn for each category - associated with cell 15 from the notebook
+    proportion of churn for each category - associated with cell 15 from the notebook
 
     input:
             df: pandas dataframe
