@@ -1,24 +1,21 @@
-# library doc string
+""" Library that predicts churners
 
-
-from sklearn.metrics import RocCurveDisplay
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+"""
 
 import logging
+import os
 
-import constants as const
-import churn_utils as cu
-
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV
-
-from sklearn.metrics import plot_roc_curve, classification_report
 import joblib
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import RocCurveDisplay, classification_report
+from sklearn.model_selection import GridSearchCV, train_test_split
+
+import churn_utils as cu
+import constants as const
 
 logging.basicConfig(
     filename=const.RESULTS_LOG,
@@ -93,23 +90,29 @@ def perform_eda(df):
 
 
 def encoder_helper(df, category_lst, encoded_category_lst=None):
-    '''
-    helper function to turn each categorical column into a new column with
+    """Helper function to turn each categorical column into a new column with
     proportion of churn for each category - associated with cell 15 from the notebook
 
-    input:
-            df: pandas dataframe
-            category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used for naming variables or index y column]
+    Args:
+        df: pandas dataframe
+        category_lst: list of columns that contain categorical features
+        encoded_category_lst (optional): list of names of the new features.
+        If None, the name of the new features will be the one of the original
+        feature followed by '_Churn'. Otherwise it should have the same length
+        as the category_lst and contain the names of the new features.
+        Defaults to None.
 
-    output:
-            df: pandas dataframe with new columns for
-    '''
+    Returns:
+        df: pandas dataframe with new columns  containing the proportions of churned
+    """
     logger.info("Turning categorical columns into proportion of churn")
-    logger.info(f"Input categorical columns: {category_lst}")
+    logger.info("Input categorical columns: %s", category_lst)
     encoded_category_lst = [
-        f'{c}_Churn' for c in category_lst] if encoded_category_lst is None else encoded_category_lst
-    logger.info(f"Output proportion of churn columns: {encoded_category_lst}")
+        f'{c}_Churn' for c in category_lst
+    ] if encoded_category_lst is None else encoded_category_lst
+    logger.info(
+        "Output proportion of churn columns: %s",
+        encoded_category_lst)
     assign_dict = {enc_c: df.groupby(c)['Churn'].transform(
         'mean') for c, enc_c in zip(category_lst, encoded_category_lst)}
     df = df.assign(**assign_dict)
@@ -117,17 +120,23 @@ def encoder_helper(df, category_lst, encoded_category_lst=None):
 
 
 def perform_feature_engineering(df):
-    '''
-    input:
-              df: pandas dataframe
-              response: string of response name [optional argument that could be used for naming variables or index y column] -- I do not understand how this is intended to be used
+    """Performs feature engineering.
+    Creates columns with the proportion of churner for some relevant categorical variables
 
-    output:
-              X_train: X training data
-              X_test: X testing data
-              y_train: y training data
-              y_test: y testing data
-    '''
+    The original function had a parameter response
+    response: string of response name [optional argument that could be
+    used for naming variables or index y column]
+    -- I did not understand how that was intended to be used so I removed it.
+
+    Args:
+        df: pandas dataframe
+
+    Returns:
+        X_train: X training data
+        X_test: X testing data
+        y_train: y training data
+        y_test: y testing data
+    """
     logger.info("**** Feature engineering")
     logger.info("Encoding categorical variables")
     category_lst = [
@@ -209,6 +218,18 @@ def classification_report_image(y_train,
 
 
 def roc_curve_plot(rfc, lrc, X_test, y_test):
+    """Plots the oc curve and saves the output in the results folder.
+    It also returns the figure.
+
+    Args:
+        rfc: random forest model
+        lrc: logistic regression model
+        X_test: test features
+        y_test: test target
+
+    Returns:
+        fig: the roc plot
+    """
     logger.info("Plotting roc curves for both models")
     lrc_plot = RocCurveDisplay.from_estimator(lrc, X_test, y_test)
     plt.close()
