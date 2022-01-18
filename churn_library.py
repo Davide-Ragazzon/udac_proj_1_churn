@@ -11,10 +11,11 @@ import logging
 import constants as const
 import churn_utils as cu
 
+
 logging.basicConfig(
-    filename='./results.log',
+    filename=const.RESULTS_LOG,
     level=logging.INFO,
-    filemode='a',
+    filemode='w',
     #format='%(name)s - %(levelname)s - %(message)s',
     format='%(asctime)s %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
@@ -49,7 +50,7 @@ def perform_eda(df):
     output:
             None
     '''
-    logger.info("Performing EDA")
+    logger.info("**** Performing EDA")
 
     logger.info("Plotting distribution of Churn")
     fig = plt.figure(figsize=(20, 10))
@@ -57,21 +58,25 @@ def perform_eda(df):
     df['Churn'].hist(ax=ax)
     cu.save_into_image_folder(fig, 'eda_churn', logger)
 
+    logger.info("Plotting distribution of Customer_Age")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df['Customer_Age'].hist(ax=ax)
     cu.save_into_image_folder(fig, 'eda_age', logger)
 
+    logger.info("Plotting distribution of Marital_Status")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df.Marital_Status.value_counts('normalize').plot(kind='bar', ax=ax)
     cu.save_into_image_folder(fig, 'eda_marital_status', logger)
 
+    logger.info("Plotting distribution of Total_Trans_Ct")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     sns.distplot(df['Total_Trans_Ct'], ax=ax)
     cu.save_into_image_folder(fig, 'eda_tot_trans_ct', logger)
 
+    logger.info("Plotting correlation between features")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2, ax=ax)
@@ -86,11 +91,12 @@ def encoder_helper(df, category_lst, response):
     input:
             df: pandas dataframe
             category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used for naming variables or index y column]
+            response: string of response name [optional argument that could be used for naming variables or index y column]  I do not understand how the response was supposed to be used -- I remove it
 
     output:
             df: pandas dataframe with new columns for
     '''
+
     pass
 
 
@@ -157,3 +163,9 @@ def train_models(X_train, X_test, y_train, y_test):
               None
     '''
     pass
+
+
+if __name__ == '__main__':
+    bank_data_csv = os.path.join(const.DATA_FOLDER, "bank_data.csv")
+    df = import_data(bank_data_csv)
+    perform_eda(df)
