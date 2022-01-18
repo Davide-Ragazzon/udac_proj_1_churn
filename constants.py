@@ -1,3 +1,8 @@
+
+import os
+
+IMG_FOLDER = os.path.abspath('./images')
+
 CAT_COLS = [
     'Gender',
     'Education_Level',
@@ -22,8 +27,6 @@ QUANT_COLS = [
     'Total_Ct_Chng_Q4_Q1',
     'Avg_Utilization_Ratio'
 ]
-
-TARGET_COL = 'Churn'
 
 KEEP_COLS = ['Customer_Age', 'Dependent_count', 'Months_on_book',
              'Total_Relationship_Count', 'Months_Inactive_12_mon',

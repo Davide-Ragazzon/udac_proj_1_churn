@@ -8,6 +8,9 @@ import seaborn as sns
 
 import logging
 
+import constants as const
+import churn_utils as cu
+
 logging.basicConfig(
     filename='./results.log',
     level=logging.INFO,
@@ -30,6 +33,7 @@ def import_data(pth):
     output:
             df: pandas dataframe
     '''
+    logger.info("Loading data")
     df = pd.read_csv(pth)
     df['Churn'] = df['Attrition_Flag'].apply(
         lambda val: 0 if val == "Existing Customer" else 1)
@@ -45,10 +49,15 @@ def perform_eda(df):
     output:
             None
     '''
+    logger.info("Performing EDA")
 
+    logger.info("Plotting distribution of Churn")
     fig_churn = plt.figure(figsize=(20, 10))
     ax = fig_churn.gca()
     df['Churn'].hist(ax=ax)
+    #logger.info(f"Saving eda_churn.png")
+    # plt.savefig('./images/eda_churn.png')
+    cu.save_into_image_folder(fig_churn, 'eda_churn', logger)
 
     fig_age = plt.figure(figsize=(20, 10))
     ax = fig_age.gca()
