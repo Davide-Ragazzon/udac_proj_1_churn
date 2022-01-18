@@ -187,7 +187,7 @@ def train_models(X_train, X_test, y_train, y_test):
               None
     '''
     logger.info("Training logistic regression")
-    lrc = LogisticRegression()
+    lrc = LogisticRegression(solver='liblinear')
     lrc.fit(X_train, y_train)
 
     logger.info("Training cross validated random forest")
