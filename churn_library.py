@@ -128,6 +128,8 @@ def perform_feature_engineering(df):
               y_train: y training data
               y_test: y testing data
     '''
+    logger.info("**** Feature engineering")
+    logger.info("Encoding categorical variables")
     category_lst = [
         'Gender',
         'Education_Level',
@@ -135,6 +137,7 @@ def perform_feature_engineering(df):
         'Income_Category',
         'Card_Category']
     df = encoder_helper(df, category_lst)
+    logger.info("Creating train test splits")
     y = df['Churn']
     X = df[const.KEEP_COLS]
     X_train, X_test, y_train, y_test = train_test_split(
@@ -245,6 +248,7 @@ def train_models(X_train, X_test, y_train, y_test):
     output:
               None
     '''
+    logger.info("**** Training the models")
     logger.info("Training logistic regression")
     lrc = LogisticRegression(solver='liblinear')
     lrc.fit(X_train, y_train)
@@ -261,12 +265,16 @@ def train_models(X_train, X_test, y_train, y_test):
     cv_rfc.fit(X_train, y_train)
     rfc = cv_rfc.best_estimator_
 
-    logger.info("Generating reports on model performances")
+    logger.info("**** Generating predictions")
+    logger.info("Predicting using logistic regression")
     y_train_preds_lr = lrc.predict(X_train)
     y_test_preds_lr = lrc.predict(X_test)
+    logger.info("Predicting using random forest")
     y_train_preds_rf = rfc.predict(X_train)
     y_test_preds_rf = rfc.predict(X_test)
 
+    logger.info("**** Model evaluation")
+    logger.info("Generating reports on model performances")
     classification_report_image(
         y_train,
         y_test,
