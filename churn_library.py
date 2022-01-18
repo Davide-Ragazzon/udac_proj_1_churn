@@ -46,15 +46,14 @@ def import_data(pth):
     return df
 
 
-def save_into_folder(fig, fig_name, logger, folder=const.IMG_FOLDER):
+def save_into_folder(fig, fig_name, folder=const.IMG_FOLDER):
     """Utility function for saving figures as .png files and logging what happened.
 
     Args:
         fig: figure to save
         fig_name: name used when saving
-        logger: logger used for logging
         folder (optional): folder where the figure needs to be saved.
-        Defaults to the image folder as defined in the constants.py as IMG_FOLDER.
+            Defaults to the image folder as defined in the constants.py as IMG_FOLDER.
     """
     logger.info(f"Saving {fig_name}.png")
     file_png = os.path.join(folder, f"{fig_name}.png")
@@ -78,32 +77,32 @@ def perform_eda(df):
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df['Churn'].hist(ax=ax)
-    save_into_folder(fig, 'eda_churn', logger)
+    save_into_folder(fig, 'eda_churn')
 
     logger.info("Plotting distribution of Customer_Age")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df['Customer_Age'].hist(ax=ax)
-    save_into_folder(fig, 'eda_age', logger)
+    save_into_folder(fig, 'eda_age')
 
     logger.info("Plotting distribution of Marital_Status")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df.Marital_Status.value_counts('normalize').plot(kind='bar', ax=ax)
-    save_into_folder(fig, 'eda_marital_status', logger)
+    save_into_folder(fig, 'eda_marital_status')
 
     logger.info("Plotting distribution of Total_Trans_Ct")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     # Causes a future warning but decided it is ok for this exercise
     sns.distplot(df['Total_Trans_Ct'], ax=ax)
-    save_into_folder(fig, 'eda_tot_trans_ct', logger)
+    save_into_folder(fig, 'eda_tot_trans_ct')
 
     logger.info("Plotting correlation between features")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2, ax=ax)
-    save_into_folder(fig, 'eda_corr', logger)
+    save_into_folder(fig, 'eda_corr')
 
 
 def encoder_helper(df, category_lst, encoded_category_lst=None):
@@ -209,7 +208,6 @@ def classification_report_image(y_train,
     save_into_folder(
         fig,
         'classification_report_logistic_regression',
-        logger,
         folder=const.RESULT_FOLDER)
 
     logger.info("Producing classification report for random forest")
@@ -230,7 +228,6 @@ def classification_report_image(y_train,
     save_into_folder(
         fig,
         'classification_report_random_forest',
-        logger,
         folder=const.RESULT_FOLDER)
 
 
@@ -256,7 +253,7 @@ def roc_curve_plot(rfc, lrc, X_test, y_test):
     lrc_plot.plot(ax=ax, alpha=0.8)
     plt.close()
     save_into_folder(
-        fig, 'roc_curve_plot', logger, folder=const.RESULT_FOLDER)
+        fig, 'roc_curve_plot', folder=const.RESULT_FOLDER)
     return fig
 
 
@@ -278,14 +275,16 @@ def feature_importance_plot(model, X_data):
     names = [X_data.columns[i] for i in indices]
 
     fig = plt.figure(figsize=(20, 5))
-    fig.title("Feature Importance")
-    fig.ylabel('Importance')
-    fig.bar(range(X_data.shape[1]), importances[indices])
-    fig.xticks(range(X_data.shape[1]), names, rotation=90)
+    ax = fig.gca()
+    fig.suptitle("Feature Importance")
+    ax.set_ylabel('Importance')
+    ax.bar(range(X_data.shape[1]), importances[indices])
+    ax.set_xticks(range(X_data.shape[1]), names, rotation=90)
+    fig.tight_layout()
     plt.close()
 
     save_into_folder(
-        fig, 'feature_importance_plot', logger, folder=const.RESULT_FOLDER)
+        fig, 'feature_importance_plot', folder=const.RESULT_FOLDER)
     return fig
 
 
@@ -309,9 +308,9 @@ def train_models(X_train, X_test, y_train, y_test):
     rfc = RandomForestClassifier(random_state=42)
     param_grid = {
         'n_estimators': [200, 300],
-        # 'max_features': ['auto', 'sqrt'],  # TODO: Uncomment parameters when the code is ready
+        'max_features': ['auto', 'sqrt'],
         'max_depth': [4, 5, 10],
-        # 'criterion': ['gini', 'entropy'],  # TODO: Uncomment parameters when the code is ready
+        'criterion': ['gini', 'entropy'],
     }
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
     cv_rfc.fit(X_train, y_train)

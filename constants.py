@@ -8,8 +8,10 @@ RESULT_FOLDER = os.path.abspath('./results')
 MODEL_FOLDER = os.path.abspath('./models')
 
 
-RESULTS_LOG = os.path.join(LOG_FOLDER, 'results.log')
-TESTS_LOG = os.path.join(LOG_FOLDER, 'churn_library.log')
+RESULTS_LOG = os.path.join(LOG_FOLDER, 'churn_library.log')
+
+# Used to test functions that save files
+TMP_TEST_FOLDER = os.path.abspath('./tmp')
 
 
 CAT_COLS = [
