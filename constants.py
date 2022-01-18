@@ -4,9 +4,12 @@ import os
 IMG_FOLDER = os.path.abspath('./images')
 LOG_FOLDER = os.path.abspath('./logs')
 DATA_FOLDER = os.path.abspath('./data')
+RESULTS_FOLDER = os.path.abspath('./results')
+
 
 RESULTS_LOG = os.path.join(LOG_FOLDER, 'results.log')
 TESTS_LOG = os.path.join(LOG_FOLDER, 'churn_library.log')
+
 
 CAT_COLS = [
     'Gender',

@@ -62,31 +62,31 @@ def perform_eda(df):
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df['Churn'].hist(ax=ax)
-    cu.save_into_image_folder(fig, 'eda_churn', logger)
+    cu.save_into_folder(fig, 'eda_churn', logger)
 
     logger.info("Plotting distribution of Customer_Age")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df['Customer_Age'].hist(ax=ax)
-    cu.save_into_image_folder(fig, 'eda_age', logger)
+    cu.save_into_folder(fig, 'eda_age', logger)
 
     logger.info("Plotting distribution of Marital_Status")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df.Marital_Status.value_counts('normalize').plot(kind='bar', ax=ax)
-    cu.save_into_image_folder(fig, 'eda_marital_status', logger)
+    cu.save_into_folder(fig, 'eda_marital_status', logger)
 
     logger.info("Plotting distribution of Total_Trans_Ct")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     sns.distplot(df['Total_Trans_Ct'], ax=ax)
-    cu.save_into_image_folder(fig, 'eda_tot_trans_ct', logger)
+    cu.save_into_folder(fig, 'eda_tot_trans_ct', logger)
 
     logger.info("Plotting correlation between features")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2, ax=ax)
-    cu.save_into_image_folder(fig, 'eda_corr', logger)
+    cu.save_into_folder(fig, 'eda_corr', logger)
 
 
 def encoder_helper(df, category_lst, encoded_category_lst=None):
@@ -164,15 +164,21 @@ def classification_report_image(y_train,
     fig = plt.figure()
     fig.text(0.01, 1.25, str('Logistic Regression Train'),
              {'fontsize': 10}, fontproperties='monospace')
-    fig.text(0.01, 0.05, str(classification_report(y_train, y_train_preds_lr)), {
-             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+    fig.text(
+        0.01, 0.05, str(
+            classification_report(
+                y_train, y_train_preds_lr)), {
+            'fontsize': 10}, fontproperties='monospace')
     fig.text(0.01, 0.6, str('Logistic Regression Test'), {
              'fontsize': 10}, fontproperties='monospace')
     fig.text(0.01, 0.7, str(classification_report(y_test, y_test_preds_lr)), {
-             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+             'fontsize': 10}, fontproperties='monospace')
     plt.axis('off')
-    cu.save_into_image_folder(
-        fig, 'classification_report_logistic_regression', logger)
+    cu.save_into_folder(
+        fig,
+        'classification_report_logistic_regression',
+        logger,
+        folder=const.RESULTS_FOLDER)
 
     logger.info("Producing classification report for random forest")
     plt.rc('figure', figsize=(5, 5))
@@ -180,14 +186,34 @@ def classification_report_image(y_train,
     fig.text(0.01, 1.25, str('Random Forest Train'), {
              'fontsize': 10}, fontproperties='monospace')
     fig.text(0.01, 0.05, str(classification_report(y_test, y_test_preds_rf)), {
-             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+             'fontsize': 10}, fontproperties='monospace')
     fig.text(0.01, 0.6, str('Random Forest Test'), {
              'fontsize': 10}, fontproperties='monospace')
-    fig.text(0.01, 0.7, str(classification_report(y_train, y_train_preds_rf)), {
-             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+    fig.text(
+        0.01, 0.7, str(
+            classification_report(
+                y_train, y_train_preds_rf)), {
+            'fontsize': 10}, fontproperties='monospace')
     plt.axis('off')
-    cu.save_into_image_folder(
-        fig, 'classification_report_random_forest', logger)
+    cu.save_into_folder(
+        fig,
+        'classification_report_random_forest',
+        logger,
+        folder=const.RESULTS_FOLDER)
+
+
+def roc_curve_plot(rfc, lrc, X_test, y_test):
+    logger.info("Plotting roc curves for both models")
+    lrc_plot = plot_roc_curve(lrc, X_test, y_test)
+    plt.close()
+    fig = plt.figure(figsize=(15, 8))
+    ax = plt.gca()
+    rfc_disp = plot_roc_curve(rfc, X_test, y_test, ax=ax, alpha=0.8)
+    lrc_plot.plot(ax=ax, alpha=0.8)
+    plt.close()
+    cu.save_into_folder(
+        fig, 'roc_curve_plot', logger, folder=const.RESULTS_FOLDER)
+    return fig
 
 
 def feature_importance_plot(model, X_data, output_pth):
@@ -229,11 +255,13 @@ def train_models(X_train, X_test, y_train, y_test):
     }
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
     cv_rfc.fit(X_train, y_train)
+    rfc = cv_rfc.best_estimator_
 
+    logger.info("Generating reports on model performances")
     y_train_preds_lr = lrc.predict(X_train)
     y_test_preds_lr = lrc.predict(X_test)
-    y_train_preds_rf = cv_rfc.best_estimator_.predict(X_train)
-    y_test_preds_rf = cv_rfc.best_estimator_.predict(X_test)
+    y_train_preds_rf = rfc.predict(X_train)
+    y_test_preds_rf = rfc.predict(X_test)
 
     classification_report_image(
         y_train,
@@ -242,6 +270,7 @@ def train_models(X_train, X_test, y_train, y_test):
         y_train_preds_rf,
         y_test_preds_lr,
         y_test_preds_rf)
+    roc_curve_plot(rfc, lrc, X_test, y_test)
 
 
 if __name__ == '__main__':
