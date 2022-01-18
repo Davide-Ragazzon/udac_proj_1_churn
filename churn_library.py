@@ -83,7 +83,7 @@ def perform_eda(df):
     cu.save_into_image_folder(fig, 'eda_corr', logger)
 
 
-def encoder_helper(df, category_lst, response):
+def encoder_helper(df, category_lst, encoded_category_lst=None):
     '''
     helper function to turn each categorical column into a new column with
     proportion of churn for each category - associated with cell 15 from the notebook
@@ -91,13 +91,20 @@ def encoder_helper(df, category_lst, response):
     input:
             df: pandas dataframe
             category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used for naming variables or index y column]  I do not understand how the response was supposed to be used -- I remove it
+            response: string of response name [optional argument that could be used for naming variables or index y column]
 
     output:
             df: pandas dataframe with new columns for
     '''
-
-    pass
+    logger.info("Turning categorical columns into proportion of churn")
+    logger.info(f"Input categorical columns: {category_lst}")
+    encoded_category_lst = [
+        f'{c}_Churn' for c in category_lst] if encoded_category_lst is None else encoded_category_lst
+    logger.info(f"Output categorical columns: {encoded_category_lst}")
+    assign_dict = {enc_c: df.groupby(c)['Churn'].transform(
+        'mean') for c, enc_c in zip(category_lst, encoded_category_lst)}
+    df = df.assign(**assign_dict)
+    return df
 
 
 def perform_feature_engineering(df, response):
@@ -169,3 +176,10 @@ if __name__ == '__main__':
     bank_data_csv = os.path.join(const.DATA_FOLDER, "bank_data.csv")
     df = import_data(bank_data_csv)
     perform_eda(df)
+    category_lst = [
+        'Gender',
+        'Education_Level',
+        'Marital_Status',
+        'Income_Category',
+        'Card_Category']
+    df = encoder_helper(df, category_lst)
