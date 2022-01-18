@@ -4,7 +4,8 @@ import os
 IMG_FOLDER = os.path.abspath('./images')
 LOG_FOLDER = os.path.abspath('./logs')
 DATA_FOLDER = os.path.abspath('./data')
-RESULTS_FOLDER = os.path.abspath('./results')
+RESULT_FOLDER = os.path.abspath('./results')
+MODEL_FOLDER = os.path.abspath('./models')
 
 
 RESULTS_LOG = os.path.join(LOG_FOLDER, 'results.log')

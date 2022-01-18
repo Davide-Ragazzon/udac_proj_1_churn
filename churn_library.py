@@ -18,6 +18,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 
 from sklearn.metrics import plot_roc_curve, classification_report
+import joblib
 
 logging.basicConfig(
     filename=const.RESULTS_LOG,
@@ -80,6 +81,7 @@ def perform_eda(df):
     logger.info("Plotting distribution of Total_Trans_Ct")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
+    # Causes a future warning but decided it is ok for this exercise
     sns.distplot(df['Total_Trans_Ct'], ax=ax)
     cu.save_into_folder(fig, 'eda_tot_trans_ct', logger)
 
@@ -179,7 +181,7 @@ def classification_report_image(y_train,
         fig,
         'classification_report_logistic_regression',
         logger,
-        folder=const.RESULTS_FOLDER)
+        folder=const.RESULT_FOLDER)
 
     logger.info("Producing classification report for random forest")
     plt.rc('figure', figsize=(5, 5))
@@ -200,7 +202,7 @@ def classification_report_image(y_train,
         fig,
         'classification_report_random_forest',
         logger,
-        folder=const.RESULTS_FOLDER)
+        folder=const.RESULT_FOLDER)
 
 
 def roc_curve_plot(rfc, lrc, X_test, y_test):
@@ -214,7 +216,7 @@ def roc_curve_plot(rfc, lrc, X_test, y_test):
     lrc_plot.plot(ax=ax, alpha=0.8)
     plt.close()
     cu.save_into_folder(
-        fig, 'roc_curve_plot', logger, folder=const.RESULTS_FOLDER)
+        fig, 'roc_curve_plot', logger, folder=const.RESULT_FOLDER)
     return fig
 
 
@@ -273,6 +275,12 @@ def train_models(X_train, X_test, y_train, y_test):
         y_test_preds_lr,
         y_test_preds_rf)
     roc_curve_plot(rfc, lrc, X_test, y_test)
+
+    logger.info("**** Saving the models")
+    logger.info("Saving logistic regression model as lrc_model.pkl")
+    joblib.dump(lrc, os.path.join(const.MODEL_FOLDER, 'lrc_model.pkl'))
+    logger.info("Saving random forest model as rfc_model.pkl")
+    joblib.dump(rfc, os.path.join(const.MODEL_FOLDER, 'rfc_model.pkl'))
 
 
 if __name__ == '__main__':
