@@ -1,6 +1,7 @@
 # library doc string
 
 
+from sklearn.metrics import RocCurveDisplay
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -204,11 +205,12 @@ def classification_report_image(y_train,
 
 def roc_curve_plot(rfc, lrc, X_test, y_test):
     logger.info("Plotting roc curves for both models")
-    lrc_plot = plot_roc_curve(lrc, X_test, y_test)
+    lrc_plot = RocCurveDisplay.from_estimator(lrc, X_test, y_test)
     plt.close()
     fig = plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    rfc_disp = plot_roc_curve(rfc, X_test, y_test, ax=ax, alpha=0.8)
+    rfc_disp = RocCurveDisplay.from_estimator(
+        rfc, X_test, y_test, ax=ax, alpha=0.8)
     lrc_plot.plot(ax=ax, alpha=0.8)
     plt.close()
     cu.save_into_folder(
