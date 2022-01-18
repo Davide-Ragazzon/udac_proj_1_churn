@@ -7,6 +7,7 @@ import os
 
 import joblib
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
@@ -235,8 +236,7 @@ def roc_curve_plot(rfc, lrc, X_test, y_test):
     plt.close()
     fig = plt.figure(figsize=(15, 8))
     ax = plt.gca()
-    rfc_disp = RocCurveDisplay.from_estimator(
-        rfc, X_test, y_test, ax=ax, alpha=0.8)
+    RocCurveDisplay.from_estimator(rfc, X_test, y_test, ax=ax, alpha=0.8)
     lrc_plot.plot(ax=ax, alpha=0.8)
     plt.close()
     cu.save_into_folder(
@@ -244,18 +244,33 @@ def roc_curve_plot(rfc, lrc, X_test, y_test):
     return fig
 
 
-def feature_importance_plot(model, X_data, output_pth):
-    '''
-    creates and stores the feature importances in pth
-    input:
-            model: model object containing feature_importances_
-            X_data: pandas dataframe of X values
-            output_pth: path to store the figure
+def feature_importance_plot(model, X_data):
+    """Creates the feature importance plot and saves it as .png in the images folder.
 
-    output:
-             None
-    '''
-    pass
+    Args:
+        model: model object containing feature_importances_
+        X_data: pandas dataframe of X values
+
+    Returns:
+        fig: the feature importance plot
+    """
+    logger.info("Plotting the feature importance")
+    importances = model.feature_importances_
+    # Sort feature importances in descending order
+    indices = np.argsort(importances)[::-1]
+    # So they match the sorted feature importances
+    names = [X_data.columns[i] for i in indices]
+
+    fig = plt.figure(figsize=(20, 5))
+    fig.title("Feature Importance")
+    fig.ylabel('Importance')
+    fig.bar(range(X_data.shape[1]), importances[indices])
+    fig.xticks(range(X_data.shape[1]), names, rotation=90)
+    plt.close()
+
+    cu.save_into_folder(
+        fig, 'feature_importance_plot', logger, folder=const.RESULT_FOLDER)
+    return fig
 
 
 def train_models(X_train, X_test, y_train, y_test):
@@ -304,6 +319,7 @@ def train_models(X_train, X_test, y_train, y_test):
         y_test_preds_lr,
         y_test_preds_rf)
     roc_curve_plot(rfc, lrc, X_test, y_test)
+    feature_importance_plot(rfc, pd.concat([X_train, X_test]))
 
     logger.info("**** Saving the models")
     logger.info("Saving logistic regression model as lrc_model.pkl")
@@ -316,5 +332,5 @@ if __name__ == '__main__':
     bank_data_csv = os.path.join(const.DATA_FOLDER, "bank_data.csv")
     df = import_data(bank_data_csv)
     perform_eda(df)
-    X_train, X_test, y_train, y_test = perform_feature_engineering(df)
-    train_models(X_train, X_test, y_train, y_test)
+    X_train_, X_test_, y_train_, y_test_ = perform_feature_engineering(df)
+    train_models(X_train_, X_test_, y_train_, y_test_)
