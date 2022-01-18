@@ -1,8 +1,23 @@
 # library doc string
 
 
-# import libraries
+import os
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import logging
+
+logging.basicConfig(
+    filename='./results.log',
+    level=logging.INFO,
+    filemode='a',
+    #format='%(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+
+logger = logging.getLogger(os.path.basename(__file__))
 
 
 def import_data(pth):
@@ -30,6 +45,26 @@ def perform_eda(df):
     output:
             None
     '''
+
+    fig_churn = plt.figure(figsize=(20, 10))
+    ax = fig_churn.gca()
+    df['Churn'].hist(ax=ax)
+
+    fig_age = plt.figure(figsize=(20, 10))
+    ax = fig_age.gca()
+    df['Customer_Age'].hist(ax=ax)
+
+    fig_marital_status = plt.figure(figsize=(20, 10))
+    ax = fig_marital_status.gca()
+    df.Marital_Status.value_counts('normalize').plot(kind='bar', ax=ax)
+
+    fig_tot_trans_ct = plt.figure(figsize=(20, 10))
+    ax = fig_tot_trans_ct.gca()
+    sns.distplot(df['Total_Trans_Ct'], ax=ax)
+
+    fig_corr = plt.figure(figsize=(20, 10))
+    ax = fig_corr.gca()
+    sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2, ax=ax)
     pass
 
 
