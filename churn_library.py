@@ -11,6 +11,11 @@ import logging
 import constants as const
 import churn_utils as cu
 
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+
 
 logging.basicConfig(
     filename=const.RESULTS_LOG,
@@ -100,18 +105,18 @@ def encoder_helper(df, category_lst, encoded_category_lst=None):
     logger.info(f"Input categorical columns: {category_lst}")
     encoded_category_lst = [
         f'{c}_Churn' for c in category_lst] if encoded_category_lst is None else encoded_category_lst
-    logger.info(f"Output categorical columns: {encoded_category_lst}")
+    logger.info(f"Output proportion of churn columns: {encoded_category_lst}")
     assign_dict = {enc_c: df.groupby(c)['Churn'].transform(
         'mean') for c, enc_c in zip(category_lst, encoded_category_lst)}
     df = df.assign(**assign_dict)
     return df
 
 
-def perform_feature_engineering(df, response):
+def perform_feature_engineering(df):
     '''
     input:
               df: pandas dataframe
-              response: string of response name [optional argument that could be used for naming variables or index y column]
+              response: string of response name [optional argument that could be used for naming variables or index y column] -- I do not understand how this is intended to be used
 
     output:
               X_train: X training data
@@ -119,6 +124,18 @@ def perform_feature_engineering(df, response):
               y_train: y training data
               y_test: y testing data
     '''
+    category_lst = [
+        'Gender',
+        'Education_Level',
+        'Marital_Status',
+        'Income_Category',
+        'Card_Category']
+    df = encoder_helper(df, category_lst)
+    y = df['Churn']
+    X = df[const.KEEP_COLS]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=42)
+    return X_train, X_test, y_train, y_test
 
 
 def classification_report_image(y_train,
@@ -169,17 +186,25 @@ def train_models(X_train, X_test, y_train, y_test):
     output:
               None
     '''
-    pass
+    logger.info("Training logistic regression")
+    lrc = LogisticRegression()
+    lrc.fit(X_train, y_train)
+
+    logger.info("Training cross validated random forest")
+    rfc = RandomForestClassifier(random_state=42)
+    param_grid = {
+        'n_estimators': [200, 300],
+        'max_features': ['auto', 'sqrt'],
+        'max_depth': [4, 5, 10],
+        'criterion': ['gini', 'entropy']
+    }
+    cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
+    cv_rfc.fit(X_train, y_train)
 
 
 if __name__ == '__main__':
     bank_data_csv = os.path.join(const.DATA_FOLDER, "bank_data.csv")
     df = import_data(bank_data_csv)
     perform_eda(df)
-    category_lst = [
-        'Gender',
-        'Education_Level',
-        'Marital_Status',
-        'Income_Category',
-        'Card_Category']
-    df = encoder_helper(df, category_lst)
+    X_train, X_test, y_train, y_test = perform_feature_engineering(df)
+    train_models(X_train, X_test, y_train, y_test)
