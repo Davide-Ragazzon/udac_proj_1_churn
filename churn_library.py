@@ -7,7 +7,8 @@ import pandas as pd
 
 def import_data(pth):
     '''
-    returns dataframe for the csv found at pth
+    Returns dataframe for the csv found at pth.
+    It makes sure that there is a Churn column with values 0 or 1.
 
     input:
             pth: a path to the csv
