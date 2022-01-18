@@ -52,29 +52,30 @@ def perform_eda(df):
     logger.info("Performing EDA")
 
     logger.info("Plotting distribution of Churn")
-    fig_churn = plt.figure(figsize=(20, 10))
-    ax = fig_churn.gca()
+    fig = plt.figure(figsize=(20, 10))
+    ax = fig.gca()
     df['Churn'].hist(ax=ax)
-    #logger.info(f"Saving eda_churn.png")
-    # plt.savefig('./images/eda_churn.png')
-    cu.save_into_image_folder(fig_churn, 'eda_churn', logger)
+    cu.save_into_image_folder(fig, 'eda_churn', logger)
 
-    fig_age = plt.figure(figsize=(20, 10))
-    ax = fig_age.gca()
+    fig = plt.figure(figsize=(20, 10))
+    ax = fig.gca()
     df['Customer_Age'].hist(ax=ax)
+    cu.save_into_image_folder(fig, 'eda_age', logger)
 
-    fig_marital_status = plt.figure(figsize=(20, 10))
-    ax = fig_marital_status.gca()
+    fig = plt.figure(figsize=(20, 10))
+    ax = fig.gca()
     df.Marital_Status.value_counts('normalize').plot(kind='bar', ax=ax)
+    cu.save_into_image_folder(fig, 'eda_marital_status', logger)
 
-    fig_tot_trans_ct = plt.figure(figsize=(20, 10))
-    ax = fig_tot_trans_ct.gca()
+    fig = plt.figure(figsize=(20, 10))
+    ax = fig.gca()
     sns.distplot(df['Total_Trans_Ct'], ax=ax)
+    cu.save_into_image_folder(fig, 'eda_tot_trans_ct', logger)
 
-    fig_corr = plt.figure(figsize=(20, 10))
-    ax = fig_corr.gca()
+    fig = plt.figure(figsize=(20, 10))
+    ax = fig.gca()
     sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2, ax=ax)
-    pass
+    cu.save_into_image_folder(fig, 'eda_corr', logger)
 
 
 def encoder_helper(df, category_lst, response):
