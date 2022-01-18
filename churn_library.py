@@ -16,6 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 
+from sklearn.metrics import plot_roc_curve, classification_report
 
 logging.basicConfig(
     filename=const.RESULTS_LOG,
@@ -158,7 +159,35 @@ def classification_report_image(y_train,
     output:
              None
     '''
-    pass
+    logger.info("Producing classification report for logistic regression")
+    plt.rc('figure', figsize=(5, 5))
+    fig = plt.figure()
+    fig.text(0.01, 1.25, str('Logistic Regression Train'),
+             {'fontsize': 10}, fontproperties='monospace')
+    fig.text(0.01, 0.05, str(classification_report(y_train, y_train_preds_lr)), {
+             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+    fig.text(0.01, 0.6, str('Logistic Regression Test'), {
+             'fontsize': 10}, fontproperties='monospace')
+    fig.text(0.01, 0.7, str(classification_report(y_test, y_test_preds_lr)), {
+             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+    plt.axis('off')
+    cu.save_into_image_folder(
+        fig, 'classification_report_logistic_regression', logger)
+
+    logger.info("Producing classification report for random forest")
+    plt.rc('figure', figsize=(5, 5))
+    fig = plt.figure()
+    fig.text(0.01, 1.25, str('Random Forest Train'), {
+             'fontsize': 10}, fontproperties='monospace')
+    fig.text(0.01, 0.05, str(classification_report(y_test, y_test_preds_rf)), {
+             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+    fig.text(0.01, 0.6, str('Random Forest Test'), {
+             'fontsize': 10}, fontproperties='monospace')
+    fig.text(0.01, 0.7, str(classification_report(y_train, y_train_preds_rf)), {
+             'fontsize': 10}, fontproperties='monospace')  # approach improved by OP -> monospace!
+    plt.axis('off')
+    cu.save_into_image_folder(
+        fig, 'classification_report_random_forest', logger)
 
 
 def feature_importance_plot(model, X_data, output_pth):
@@ -194,12 +223,25 @@ def train_models(X_train, X_test, y_train, y_test):
     rfc = RandomForestClassifier(random_state=42)
     param_grid = {
         'n_estimators': [200, 300],
-        'max_features': ['auto', 'sqrt'],
+        # 'max_features': ['auto', 'sqrt'],  # TODO: Uncomment parameters when the code is ready
         'max_depth': [4, 5, 10],
-        'criterion': ['gini', 'entropy']
+        # 'criterion': ['gini', 'entropy'],  # TODO: Uncomment parameters when the code is ready
     }
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
     cv_rfc.fit(X_train, y_train)
+
+    y_train_preds_lr = lrc.predict(X_train)
+    y_test_preds_lr = lrc.predict(X_test)
+    y_train_preds_rf = cv_rfc.best_estimator_.predict(X_train)
+    y_test_preds_rf = cv_rfc.best_estimator_.predict(X_test)
+
+    classification_report_image(
+        y_train,
+        y_test,
+        y_train_preds_lr,
+        y_train_preds_rf,
+        y_test_preds_lr,
+        y_test_preds_rf)
 
 
 if __name__ == '__main__':
