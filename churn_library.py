@@ -15,7 +15,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import RocCurveDisplay, classification_report
 from sklearn.model_selection import GridSearchCV, train_test_split
 
-import churn_utils as cu
 import constants as const
 
 logging.basicConfig(
@@ -47,6 +46,23 @@ def import_data(pth):
     return df
 
 
+def save_into_folder(fig, fig_name, logger, folder=const.IMG_FOLDER):
+    """Utility function for saving figures as .png files and logging what happened.
+
+    Args:
+        fig: figure to save
+        fig_name: name used when saving
+        logger: logger used for logging
+        folder (optional): folder where the figure needs to be saved.
+        Defaults to the image folder as defined in the constants.py as IMG_FOLDER.
+    """
+    logger.info(f"Saving {fig_name}.png")
+    file_png = os.path.join(folder, f"{fig_name}.png")
+    fig.savefig(file_png)
+    # Added because having the figure always displayed can get very annoying...
+    plt.close(fig)
+
+
 def perform_eda(df):
     '''
     perform eda on df and save figures to images folder
@@ -62,32 +78,32 @@ def perform_eda(df):
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df['Churn'].hist(ax=ax)
-    cu.save_into_folder(fig, 'eda_churn', logger)
+    save_into_folder(fig, 'eda_churn', logger)
 
     logger.info("Plotting distribution of Customer_Age")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df['Customer_Age'].hist(ax=ax)
-    cu.save_into_folder(fig, 'eda_age', logger)
+    save_into_folder(fig, 'eda_age', logger)
 
     logger.info("Plotting distribution of Marital_Status")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     df.Marital_Status.value_counts('normalize').plot(kind='bar', ax=ax)
-    cu.save_into_folder(fig, 'eda_marital_status', logger)
+    save_into_folder(fig, 'eda_marital_status', logger)
 
     logger.info("Plotting distribution of Total_Trans_Ct")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     # Causes a future warning but decided it is ok for this exercise
     sns.distplot(df['Total_Trans_Ct'], ax=ax)
-    cu.save_into_folder(fig, 'eda_tot_trans_ct', logger)
+    save_into_folder(fig, 'eda_tot_trans_ct', logger)
 
     logger.info("Plotting correlation between features")
     fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2, ax=ax)
-    cu.save_into_folder(fig, 'eda_corr', logger)
+    save_into_folder(fig, 'eda_corr', logger)
 
 
 def encoder_helper(df, category_lst, encoded_category_lst=None):
@@ -190,7 +206,7 @@ def classification_report_image(y_train,
     fig.text(0.01, 0.7, str(classification_report(y_test, y_test_preds_lr)), {
              'fontsize': 10}, fontproperties='monospace')
     plt.axis('off')
-    cu.save_into_folder(
+    save_into_folder(
         fig,
         'classification_report_logistic_regression',
         logger,
@@ -211,7 +227,7 @@ def classification_report_image(y_train,
                 y_train, y_train_preds_rf)), {
             'fontsize': 10}, fontproperties='monospace')
     plt.axis('off')
-    cu.save_into_folder(
+    save_into_folder(
         fig,
         'classification_report_random_forest',
         logger,
@@ -239,7 +255,7 @@ def roc_curve_plot(rfc, lrc, X_test, y_test):
     RocCurveDisplay.from_estimator(rfc, X_test, y_test, ax=ax, alpha=0.8)
     lrc_plot.plot(ax=ax, alpha=0.8)
     plt.close()
-    cu.save_into_folder(
+    save_into_folder(
         fig, 'roc_curve_plot', logger, folder=const.RESULT_FOLDER)
     return fig
 
@@ -268,7 +284,7 @@ def feature_importance_plot(model, X_data):
     fig.xticks(range(X_data.shape[1]), names, rotation=90)
     plt.close()
 
-    cu.save_into_folder(
+    save_into_folder(
         fig, 'feature_importance_plot', logger, folder=const.RESULT_FOLDER)
     return fig
 
