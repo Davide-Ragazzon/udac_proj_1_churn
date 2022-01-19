@@ -2,11 +2,12 @@
 Module for testing the functions in churn_library.
 """
 
-import pandas as pd
 import logging
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 import churn_library as cl
 import constants as const
@@ -161,6 +162,32 @@ def test_perform_feature_engineering(perform_feature_engineering):
 
 
 def test_classification_report_image(classification_report_image):
+    y_train = np.array([1, 0, 0, 0, 1, 1, 1])
+    y_test = np.array([0, 0, 1, 1, 1])
+    y_train_preds_lr = np.array([1, 0, 1, 1, 0, 0, 1])
+    y_train_preds_rf = np.array([1, 0, 0, 1, 0, 1, 1])
+    y_test_preds_lr = np.array([0, 0, 1, 0, 0])
+    y_test_preds_rf = np.array([0, 0, 1, 1, 0])
+    classification_report_image(y_train,
+                                y_test,
+                                y_train_preds_lr,
+                                y_train_preds_rf,
+                                y_test_preds_lr,
+                                y_test_preds_rf)
+    try:
+        assert os.path.isfile(
+            os.path.join(
+                const.RESULT_FOLDER,
+                'classification_report_logistic_regression.png'))
+        assert os.path.isfile(
+            os.path.join(
+                const.RESULT_FOLDER,
+                'classification_report_random_forest.png'))
+        logger.info('Testing classification_report_image: SUCCESS')
+    except AssertionError:
+        logger.error(
+            'Testing classification_report_image: expected file not found')
+
     pass
 
 
@@ -183,4 +210,5 @@ if __name__ == "__main__":
     # test_save_into_folder(cl.save_into_folder)
     # test_perform_eda(cl.perform_eda)
     # test_encoder_helper(cl.encoder_helper)
-    test_perform_feature_engineering(cl.perform_feature_engineering)
+    # test_perform_feature_engineering(cl.perform_feature_engineering)
+    test_classification_report_image(cl.classification_report_image)
