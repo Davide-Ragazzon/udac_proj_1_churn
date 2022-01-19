@@ -127,6 +127,37 @@ def test_perform_feature_engineering(perform_feature_engineering):
     '''
     test perform_feature_engineering
     '''
+    df = pd.DataFrame({
+        'Churn': [0, 1, 0, 1],
+        'Customer_Age': [20, 30, 40, 50],
+        'Marital_Status': ['Married', 'Single', 'Married', 'Unknown'],
+        'Total_Trans_Ct': [55, 65, 75, 85],
+        'Gender': ['M', 'F', 'M', 'F'],
+        'Education_Level': ['Uneducated', 'Uneducated', 'High school', 'Graduate'],
+        'Income_Category': ['Less than $40K', '80k-120k', '60k-80k', '60k-80k'],
+        'Card_Category': ['Blue', 'Blue', 'Blue', 'Blue', ],
+    })
+    other_needed_cols = [c for c in const.KEEP_COLS if c not in df.columns]
+    # Filled with dummy values
+    df = df.assign(**{c: [1, 1, 1, 1] for c in other_needed_cols})
+    result = perform_feature_engineering(df)
+
+    try:
+        assert len(result) == 4
+        logger.info(
+            'Testing perform_feature_engineering: SUCCESS - Correct number of outputs')
+    except AssertionError:
+        logger.error(
+            'Testing perform_feature_engineering: Wrong number of outputs')
+
+    X_train = result[0]
+    try:
+        assert X_train.shape == (2, 19)
+        logger.info(
+            'Testing perform_feature_engineering: SUCCESS - Expected shape of train set')
+    except AssertionError:
+        logger.error(
+            'Testing perform_feature_engineering: Wrong shape of train set')
 
 
 def test_classification_report_image(classification_report_image):
@@ -151,4 +182,5 @@ if __name__ == "__main__":
     logger.info("**** Performing tests for functions in churn_library.py")
     # test_save_into_folder(cl.save_into_folder)
     # test_perform_eda(cl.perform_eda)
-    test_encoder_helper(cl.encoder_helper)
+    # test_encoder_helper(cl.encoder_helper)
+    test_perform_feature_engineering(cl.perform_feature_engineering)
