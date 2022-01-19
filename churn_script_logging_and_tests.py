@@ -2,14 +2,17 @@
 Module for testing the functions in churn_library.
 """
 
-import os
+import pandas as pd
 import logging
-#import churn_library_solution as cls
-
-import constants as const
-import churn_library as cl
+import os
 
 import matplotlib.pyplot as plt
+
+import churn_library as cl
+import constants as const
+
+#import churn_library_solution as cls
+
 
 logging.basicConfig(
     filename=const.RESULTS_LOG,
@@ -48,7 +51,6 @@ def test_save_into_folder(save_into_folder):
     folder = const.TMP_TEST_FOLDER
     expected_file = os.path.join(folder, 'tmp_test.png')
     if os.path.isfile(expected_file):
-        print('yes')
         os.remove(expected_file)
     # Prepare figure to be saved
     fig = plt.figure()
@@ -66,13 +68,59 @@ def test_save_into_folder(save_into_folder):
 def test_perform_eda(perform_eda):
     '''
     test perform eda function
+    Checks if files exist as suggested in the Udacity questions
+    https://knowledge.udacity.com/questions/602346
     '''
+    df = pd.DataFrame({
+        'Churn': [0, 1, 0, 1],
+        'Customer_Age': [20, 30, 40, 50],
+        'Marital_Status': ['Married', 'Single', 'Married', 'Unknown'],
+        'Total_Trans_Ct': [55, 65, 75, 85],
+    })
+    perform_eda(df)
+
+    try:
+        assert os.path.isfile(os.path.join(const.IMG_FOLDER, 'eda_churn.png'))
+        assert os.path.isfile(os.path.join(const.IMG_FOLDER, 'eda_age.png'))
+        assert os.path.isfile(
+            os.path.join(
+                const.IMG_FOLDER,
+                'eda_marital_status.png'))
+        assert os.path.isfile(
+            os.path.join(
+                const.IMG_FOLDER,
+                'eda_tot_trans_ct.png'))
+        assert os.path.isfile(os.path.join(const.IMG_FOLDER, 'eda_corr.png'))
+        logger.info('Testing perform_eda: SUCCESS')
+    except AssertionError:
+        logger.error('Testing perform_eda: expected file not found')
 
 
 def test_encoder_helper(encoder_helper):
     '''
     test encoder helper
     '''
+    df = pd.DataFrame({
+        'Churn': [0, 1, 1, 1],
+        'Marital_Status': ['Married', 'Single', 'Married', 'Unknown'],
+    })
+    df = encoder_helper(df, ['Marital_Status'])
+
+    try:
+        assert 'Marital_Status_Churn' in df.columns
+        logger.info('Testing encoder_helper: SUCCESS - Expected column found')
+    except AssertionError:
+        logger.error('Testing encoder_helper: expected column not found')
+
+    if 'Marital_Status_Churn' not in df.columns:
+        logger.info(
+            'Testing encoder_helper: Skipping value test because of missing requred field')
+        return
+    try:
+        assert df['Marital_Status_Churn'].tolist() == [0.5, 1.0, 0.5, 1.0]
+        logger.info('Testing encoder_helper: SUCCESS - Expected values found')
+    except AssertionError:
+        logger.error('Testing encoder_helper: Expected values not found')
 
 
 def test_perform_feature_engineering(perform_feature_engineering):
@@ -100,4 +148,7 @@ def test_train_models(train_models):
 
 
 if __name__ == "__main__":
-    test_save_into_folder(cl.save_into_folder)
+    logger.info("**** Performing tests for functions in churn_library.py")
+    # test_save_into_folder(cl.save_into_folder)
+    # test_perform_eda(cl.perform_eda)
+    test_encoder_helper(cl.encoder_helper)
