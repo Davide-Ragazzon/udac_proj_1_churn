@@ -3,14 +3,10 @@
 - Project **Predict Customer Churn** of ML DevOps Engineer Nanodegree Udacity
 
 ## Project Description
-Project for the Udacity course.
-The aim of this part of the course is to learn about good practices for writing clean code.
-This data science project predicts churn in a bank.
+Project for the Udacity course.  
+The aim of this part of the course is to learn about good practices for writing clean code.  This data science project predicts churn in a bank.
 
 ### Inputs and outputs
-
-
-
 - Folders used for inputs and outputs can be specified in `constants.py`:
     - `DATA_FOLDER`: (default `./data`) raw data 
     - `IMG_FOLDER`: (default `./images`) exploratory data analysis (EDA) plots
