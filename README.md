@@ -4,7 +4,8 @@
 
 ## Project Description
 Project for the Udacity course.  
-The aim of this part of the course is to learn about good practices for writing clean code.  This data science project predicts churn in a bank.
+The aim of this part of the course is to learn about good practices for writing clean code.  
+This data science project predicts churn in a bank.
 
 ### Inputs and outputs
 - Raw data needs to be provided as the .csv file `bank_data.csv` in the `DATA_FOLDER`
@@ -16,7 +17,8 @@ The aim of this part of the course is to learn about good practices for writing 
     - `LOG_FOLDER`: (default `./logs`) logs
 - `constants.py` also allows to specify:
     - `KEEP_COLS`: features used for modeling
-    - `RESULTS_LOG`:  (default `./logs/churn_library.log`) the file where the progress is logged (intended to be located within the `LOG_FOLDER`)
+    - `RESULTS_LOG`:  (default `./logs/churn_library.log`) the file where the progress is logged  
+    (intended to be located within the `LOG_FOLDER`)
     - `TMP_TEST_FOLDER`: (default `./tmp`) folder to be used for selected tests involving file creation
 
 ### Analysis
