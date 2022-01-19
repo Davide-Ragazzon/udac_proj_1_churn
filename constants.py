@@ -1,4 +1,6 @@
-
+""" Constanst used in the churn library
+Allows to customize the paths to relevant files and folders and the features used when modeling
+"""
 import os
 
 DATA_FOLDER = os.path.abspath('./data')

@@ -55,7 +55,7 @@ def save_into_folder(fig, fig_name, folder=const.IMG_FOLDER):
         folder (optional): folder where the figure needs to be saved.
             Defaults to the image folder as defined in the constants.py as IMG_FOLDER.
     """
-    logger.info(f"Saving {fig_name}.png")
+    logger.info("Saving %s.png", fig_name)
     file_png = os.path.join(folder, f"{fig_name}.png")
     fig.savefig(file_png)
     # Added because having the figure always displayed can get very annoying...

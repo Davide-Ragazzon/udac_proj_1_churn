@@ -51,6 +51,8 @@ def test_import_data(import_data):
 
 
 def test_save_into_folder(save_into_folder):
+    """ Test the function save_into_folder
+    """
     # Start with a clean folder
     folder = const.TMP_TEST_FOLDER
     expected_file = os.path.join(folder, 'tmp_test.png')
@@ -165,6 +167,9 @@ def test_perform_feature_engineering(perform_feature_engineering):
 
 
 def test_classification_report_image(classification_report_image):
+    """ Test the function classification_report_image
+    """
+
     y_train = np.array([1, 0, 0, 0, 1, 1, 1])
     y_test = np.array([0, 0, 1, 1, 1])
     y_train_preds_lr = np.array([1, 0, 1, 1, 0, 0, 1])
@@ -193,6 +198,8 @@ def test_classification_report_image(classification_report_image):
 
 
 def test_roc_curve_plot(roc_curve_plot):
+    """ Test the function roc_curve_plot
+    """
     y = np.array([0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0])
     noise = np.array([1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1]) * 0.1
     var_1 = y + noise
@@ -221,6 +228,8 @@ def test_roc_curve_plot(roc_curve_plot):
 
 
 def test_feature_importance_plot(feature_importance_plot):
+    """ Test the function feature_importance_plot
+    """
     y = np.array([0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0])
     noise = np.array([1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1]) * 0.1
     var_1 = y + noise
