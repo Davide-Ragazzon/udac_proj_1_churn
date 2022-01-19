@@ -7,13 +7,13 @@ Project for the Udacity course.
 The aim of this part of the course is to learn about good practices for writing clean code.  This data science project predicts churn in a bank.
 
 ### Inputs and outputs
+- Raw data needs to be provided as the .csv file `bank_data.csv` in the `DATA_FOLDER`
 - Folders used for inputs and outputs can be specified in `constants.py`:
     - `DATA_FOLDER`: (default `./data`) raw data 
     - `IMG_FOLDER`: (default `./images`) exploratory data analysis (EDA) plots
     - `MODEL_FOLDER`: (default `./models`) pickled models
     - `RESULT_FOLDER`: (default `./results`) model reports, feature importance and ROC curves
     - `LOG_FOLDER`: (default `./logs`) logs
-- Raw data are provided as the .csv file `bank_data.csv` in the `DATA_FOLDER`
 - `constants.py` also allows to specify:
     - `KEEP_COLS`: features used for modeling
     - `RESULTS_LOG`:  (default `./logs/churn_library.log`) the file where the progress is logged (intended to be located within the `LOG_FOLDER`)
@@ -32,8 +32,10 @@ The following data science analysis is performed:
 A log of the progress of this analysis can be found in the `RESULT_LOG` file
 
 ## Running Files
+Make sure the raw data are found in a .csv file called `bank_data.csv` in the `DATA_FOLDER`
+(by default `./data/bank_data.csv`)  
 
-The analysis described aboved are peroformed by running  
+The analysis described aboved are performed by running  
 ```python churn_library.py```
 
 Unit tests for all the functions in `churn_library.py` are performed by running  
