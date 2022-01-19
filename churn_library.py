@@ -1,5 +1,7 @@
 """ Library that predicts churners
 
+Author: Davide R
+Date: 2022-01-19
 """
 
 import logging

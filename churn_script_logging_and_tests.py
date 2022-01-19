@@ -1,5 +1,8 @@
 """
 Module for testing the functions in churn_library.
+
+Author: Davide R
+Date: 2022-01-19
 """
 
 import logging

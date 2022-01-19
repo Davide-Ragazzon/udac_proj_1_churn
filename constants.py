@@ -1,5 +1,8 @@
 """ Constanst used in the churn library
 Allows to customize the paths to relevant files and folders and the features used when modeling
+
+Author: Davide R
+Date: 2022-01-19
 """
 import os
 
