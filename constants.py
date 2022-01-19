@@ -1,13 +1,12 @@
 
 import os
 
-IMG_FOLDER = os.path.abspath('./images')
-LOG_FOLDER = os.path.abspath('./logs')
 DATA_FOLDER = os.path.abspath('./data')
-RESULT_FOLDER = os.path.abspath('./results')
+IMG_FOLDER = os.path.abspath('./images')
 MODEL_FOLDER = os.path.abspath('./models')
+RESULT_FOLDER = os.path.abspath('./results')
 
-
+LOG_FOLDER = os.path.abspath('./logs')
 RESULTS_LOG = os.path.join(LOG_FOLDER, 'churn_library.log')
 
 # Used to test functions that save files

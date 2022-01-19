@@ -304,7 +304,7 @@ def train_models(X_train, X_test, y_train, y_test):
     lrc = LogisticRegression(solver='liblinear')
     lrc.fit(X_train, y_train)
 
-    logger.info("Training cross validated random forest")
+    logger.info("Training cross-validated random forest")
     rfc = RandomForestClassifier(random_state=42)
     param_grid = {
         'n_estimators': [200, 300],
@@ -315,6 +315,12 @@ def train_models(X_train, X_test, y_train, y_test):
     cv_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv=5)
     cv_rfc.fit(X_train, y_train)
     rfc = cv_rfc.best_estimator_
+
+    logger.info("**** Saving the models")
+    logger.info("Saving logistic regression model as lrc_model.pkl")
+    joblib.dump(lrc, os.path.join(const.MODEL_FOLDER, 'lrc_model.pkl'))
+    logger.info("Saving random forest model as rfc_model.pkl")
+    joblib.dump(rfc, os.path.join(const.MODEL_FOLDER, 'rfc_model.pkl'))
 
     logger.info("**** Generating predictions")
     logger.info("Predicting using logistic regression")
@@ -335,12 +341,6 @@ def train_models(X_train, X_test, y_train, y_test):
         y_test_preds_rf)
     roc_curve_plot(rfc, lrc, X_test, y_test)
     feature_importance_plot(rfc, pd.concat([X_train, X_test]))
-
-    logger.info("**** Saving the models")
-    logger.info("Saving logistic regression model as lrc_model.pkl")
-    joblib.dump(lrc, os.path.join(const.MODEL_FOLDER, 'lrc_model.pkl'))
-    logger.info("Saving random forest model as rfc_model.pkl")
-    joblib.dump(rfc, os.path.join(const.MODEL_FOLDER, 'rfc_model.pkl'))
 
 
 if __name__ == '__main__':

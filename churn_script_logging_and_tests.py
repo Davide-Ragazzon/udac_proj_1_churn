@@ -300,17 +300,16 @@ def test_train_models(train_models):
     except TypeError:
         logger.error(
             'Testing train_models: wrong type for random forest model')
-    print(type(lrc))
-    print(type(rfc))
 
 
 if __name__ == "__main__":
-    logger.info("**** Performing tests for functions in churn_library.py")
-    # test_save_into_folder(cl.save_into_folder)
-    # test_perform_eda(cl.perform_eda)
-    # test_encoder_helper(cl.encoder_helper)
-    # test_perform_feature_engineering(cl.perform_feature_engineering)
-    # test_classification_report_image(cl.classification_report_image)
-    # test_roc_curve_plot(cl.roc_curve_plot)
-    # test_feature_importance_plot(cl.feature_importance_plot)
+    logger.info(
+        "**** Performing tests for all the functions in churn_library.py")
+    test_save_into_folder(cl.save_into_folder)
+    test_perform_eda(cl.perform_eda)
+    test_encoder_helper(cl.encoder_helper)
+    test_perform_feature_engineering(cl.perform_feature_engineering)
+    test_classification_report_image(cl.classification_report_image)
+    test_roc_curve_plot(cl.roc_curve_plot)
+    test_feature_importance_plot(cl.feature_importance_plot)
     test_train_models(cl.train_models)
