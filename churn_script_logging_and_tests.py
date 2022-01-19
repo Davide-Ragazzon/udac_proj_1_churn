@@ -2,13 +2,14 @@
 Module for testing the functions in churn_library.
 """
 
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 import logging
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
 
 import churn_library as cl
 import constants as const
@@ -219,7 +220,34 @@ def test_roc_curve_plot(roc_curve_plot):
 
 
 def test_feature_importance_plot(feature_importance_plot):
-    pass
+    y = np.array([0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0])
+    noise = np.array([1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1]) * 0.1
+    var_1 = y + noise
+    var_2 = np.square(noise)
+    X = pd.DataFrame({'var_1': var_1, 'var_2': var_2})
+    rfc = RandomForestClassifier()
+    rfc.fit(X, y)
+    fig = feature_importance_plot(rfc, X)
+
+    try:
+        matplotlib_fig = plt.figure()
+        if not isinstance(fig, type(matplotlib_fig)):
+            raise TypeError
+        logger.info(
+            'Testing feature_importance_plot: SUCCESS - output is a matplotlib figure')
+    except TypeError:
+        logger.error(
+            'Testing feature_importance_plot: output is not a matplotlib figure')
+    try:
+        expected_file = os.path.join(
+            const.RESULT_FOLDER,
+            'feature_importance_plot.png')
+        assert os.path.isfile(expected_file)
+        logger.info(
+            'Testing feature_importance_plot: SUCCESS - expected file found')
+    except AssertionError:
+        logger.error(
+            'Testing feature_importance_plot: expected file not found')
 
 
 def test_train_models(train_models):
@@ -235,4 +263,5 @@ if __name__ == "__main__":
     # test_encoder_helper(cl.encoder_helper)
     # test_perform_feature_engineering(cl.perform_feature_engineering)
     # test_classification_report_image(cl.classification_report_image)
-    test_roc_curve_plot(cl.roc_curve_plot)
+    # test_roc_curve_plot(cl.roc_curve_plot)
+    test_feature_importance_plot(cl.feature_importance_plot)
