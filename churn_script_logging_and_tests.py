@@ -2,13 +2,14 @@
 Module for testing the functions in churn_library.
 """
 
-from sklearn.ensemble import RandomForestClassifier
 import logging
 import os
 
+import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 
 import churn_library as cl
@@ -254,6 +255,53 @@ def test_train_models(train_models):
     '''
     test train_models
     '''
+    y = np.array([0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0])
+    noise = np.array([1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1]) * 0.1
+    var_1 = y + noise
+    var_2 = np.square(noise)
+    X = pd.DataFrame({'var_1': var_1, 'var_2': var_2})
+    train_models(X, X, y, y)
+    files_ok = None
+    try:
+        assert os.path.isfile(
+            os.path.join(
+                const.MODEL_FOLDER,
+                'lrc_model.pkl'))
+        assert os.path.isfile(
+            os.path.join(
+                const.MODEL_FOLDER,
+                'rfc_model.pkl'))
+        logger.info('Testing train_models: SUCCESS')
+        files_ok = True
+    except AssertionError:
+        logger.error('Testing train_models: expected file not found')
+        files_ok = False
+
+    if not files_ok:
+        logger.info(
+            'Testing train_models: Skipping type check because of missing requred file')
+        return
+    lrc = joblib.load(os.path.join(const.MODEL_FOLDER, 'lrc_model.pkl'))
+    rfc = joblib.load(os.path.join(const.MODEL_FOLDER, 'rfc_model.pkl'))
+
+    try:
+        if not isinstance(lrc, type(LogisticRegression())):
+            raise TypeError
+        logger.info(
+            'Testing train_models: SUCCESS - correct type for logistic regression model')
+    except TypeError:
+        logger.error(
+            'Testing train_models: wrong type for logistic regression model')
+    try:
+        if not isinstance(rfc, type(RandomForestClassifier())):
+            raise TypeError
+        logger.info(
+            'Testing train_models: SUCCESS - correct type for random forest model')
+    except TypeError:
+        logger.error(
+            'Testing train_models: wrong type for random forest model')
+    print(type(lrc))
+    print(type(rfc))
 
 
 if __name__ == "__main__":
@@ -264,4 +312,5 @@ if __name__ == "__main__":
     # test_perform_feature_engineering(cl.perform_feature_engineering)
     # test_classification_report_image(cl.classification_report_image)
     # test_roc_curve_plot(cl.roc_curve_plot)
-    test_feature_importance_plot(cl.feature_importance_plot)
+    # test_feature_importance_plot(cl.feature_importance_plot)
+    test_train_models(cl.train_models)
