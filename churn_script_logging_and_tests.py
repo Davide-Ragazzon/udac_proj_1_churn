@@ -2,6 +2,7 @@
 Module for testing the functions in churn_library.
 """
 
+from sklearn.linear_model import LogisticRegression
 import logging
 import os
 
@@ -188,11 +189,33 @@ def test_classification_report_image(classification_report_image):
         logger.error(
             'Testing classification_report_image: expected file not found')
 
-    pass
 
+def test_roc_curve_plot(roc_curve_plot):
+    y = np.array([0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0])
+    noise = np.array([1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1]) * 0.1
+    var_1 = y + noise
+    X = pd.DataFrame({'var_1': var_1})
+    lrc = LogisticRegression()
+    lrc.fit(X, y)
+    rfc = lrc  # Dummy for the test
+    fig = roc_curve_plot(rfc, lrc, X, y)
 
-def test_roc_curve_plot():
-    pass
+    try:
+        matplotlib_fig = plt.figure()
+        if not isinstance(fig, type(matplotlib_fig)):
+            raise TypeError
+        logger.info(
+            'Testing roc_curve_plot: SUCCESS - output is a matplotlib figure')
+    except TypeError:
+        logger.error(
+            'Testing roc_curve_plot: output is not a matplotlib figure')
+    try:
+        expected_file = os.path.join(const.RESULT_FOLDER, 'roc_curve_plot.png')
+        assert os.path.isfile(expected_file)
+        logger.info('Testing roc_curve_plot: SUCCESS - expected file found')
+    except AssertionError:
+        logger.error(
+            'Testing roc_curve_plot: expected file not found')
 
 
 def test_feature_importance_plot(feature_importance_plot):
@@ -211,4 +234,5 @@ if __name__ == "__main__":
     # test_perform_eda(cl.perform_eda)
     # test_encoder_helper(cl.encoder_helper)
     # test_perform_feature_engineering(cl.perform_feature_engineering)
-    test_classification_report_image(cl.classification_report_image)
+    # test_classification_report_image(cl.classification_report_image)
+    test_roc_curve_plot(cl.roc_curve_plot)
